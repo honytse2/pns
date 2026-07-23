@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>副交感 · Office Reset Tracker</title>
+<meta name="theme-color" content="#0A0A0B">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="description" content="Daily parasympathetic reset tracker — private, offline, stored on this device.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="副交感">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0A0B; --panel:#121214; --line:#26262A;
+    --chalk:#EDEAE2; --dim:#8E8E96; --brass:#C9A227; --red:#C05050; --ok:#7FB069;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --sans:'IBM Plex Sans','PingFang HK','Noto Sans TC',sans-serif;
+    --disp:'Fraunces','Noto Serif TC',serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:#050506;color:var(--chalk);font-family:var(--sans);font-weight:300;line-height:1.55;font-size:16px}
+  .wrap{max-width:560px;margin:0 auto;background:var(--bg);min-height:100vh;border-left:1px solid var(--line);border-right:1px solid var(--line);padding:28px 20px 80px}
+
+  header{border-bottom:2px solid var(--brass);padding-bottom:18px;margin-bottom:16px}
+  .stamp{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+  h1{font-family:var(--disp);font-weight:300;font-size:30px;line-height:1.15}
+  h1 em{font-style:italic;color:var(--brass)}
+
+  /* manifesto */
+  .manifesto{
+    border:1px solid var(--brass);border-radius:8px;background:linear-gradient(180deg,rgba(201,162,39,.10),rgba(201,162,39,.03));
+    padding:16px 18px;margin-bottom:18px;
+  }
+  .manifesto .zh{font-family:var(--disp);font-size:18px;line-height:1.6;color:var(--chalk)}
+  .manifesto .en{font-size:12.5px;color:var(--dim);margin-top:8px}
+  .manifesto .en b{color:var(--brass);font-weight:500}
+
+  .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px}
+
+  #status{font-family:var(--mono);font-size:11px;color:var(--dim);min-height:16px;margin-bottom:14px}
+  #status.err{color:var(--red)}
+
+  .stats{display:flex;gap:10px;margin-bottom:16px}
+  .stat{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:13px 8px;text-align:center}
+  .stat b{display:block;font-family:var(--mono);font-size:22px;font-weight:500;color:var(--brass)}
+  .stat span{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+
+  .sessions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .sess{
+    border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--chalk);
+    font-family:var(--sans);font-weight:400;font-size:13px;padding:16px 6px;cursor:pointer;
+    display:flex;flex-direction:column;gap:6px;align-items:center;transition:border-color .15s, background .15s;
+  }
+  .sess .zh{font-family:var(--disp);font-size:15px}
+  .sess .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
+  .sess.done{background:rgba(201,162,39,.10);border-color:var(--brass)}
+  .sess.done .t{color:var(--brass)}
+  .sess.done::after{content:"✓ logged";font-family:var(--mono);font-size:9.5px;color:var(--ok)}
+  .hint{font-size:12.5px;color:var(--dim);margin-top:12px}
+  .hint b{color:var(--brass);font-weight:500}
+
+  /* misread converter */
+  .convert{display:flex;align-items:center;gap:14px}
+  .convert button{
+    border:1px solid var(--brass);border-radius:8px;background:transparent;color:var(--brass);
+    font-family:var(--sans);font-weight:500;font-size:13.5px;padding:14px 16px;cursor:pointer;flex:1;
+  }
+  .convert button:active{background:rgba(201,162,39,.15)}
+  .convert .count{font-family:var(--mono);font-size:26px;color:var(--brass);min-width:44px;text-align:center}
+  .convert .count span{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+
+  .scoreRow{display:flex;gap:6px;flex-wrap:wrap}
+  .scoreRow button{
+    width:40px;height:40px;border-radius:6px;border:1px solid var(--line);background:transparent;
+    color:var(--chalk);font-family:var(--mono);font-size:14px;cursor:pointer;
+  }
+  .scoreRow button.sel{background:var(--brass);color:#0A0A0B;border-color:var(--brass);font-weight:500}
+
+  .tog{
+    width:100%;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--dim);
+    font-family:var(--sans);font-size:13px;padding:12px;cursor:pointer;
+  }
+  .tog.on{border-color:var(--red);color:var(--chalk);background:rgba(192,80,80,.12)}
+
+  textarea{
+    width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;
+    color:var(--chalk);font-family:var(--sans);font-size:14px;padding:12px;min-height:60px;resize:vertical;
+  }
+  textarea:focus{outline:2px solid var(--brass);outline-offset:1px}
+
+  .save{
+    width:100%;background:var(--brass);color:#0A0A0B;border:none;border-radius:8px;
+    font-family:var(--sans);font-weight:600;font-size:15px;padding:15px;cursor:pointer;margin-top:4px;
+  }
+  .save:active{opacity:.85}
+
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .day{
+    aspect-ratio:1;border-radius:6px;border:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    font-family:var(--mono);font-size:9px;color:var(--dim);
+  }
+  .day b{font-size:12px;font-weight:500;color:var(--chalk)}
+  .day.l1{background:rgba(201,162,39,.14)}
+  .day.l2{background:rgba(201,162,39,.32)}
+  .day.l3{background:rgba(201,162,39,.58)}
+  .day.l3 b{color:#0A0A0B}
+  .day.hd{box-shadow:inset 0 0 0 1.5px var(--red)}
+  .legend{display:flex;gap:14px;margin-top:10px;font-family:var(--mono);font-size:9.5px;color:var(--dim);flex-wrap:wrap}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+
+  .foot{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .foot span{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--dim)}
+  .ghost{background:none;border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:6px;cursor:pointer}
+  :focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="stamp">Companion instrument · WYK-01 · daily habit record</div>
+  <h1>副交感放鬆 <em>office reset</em></h1>
+</header>
+
+<div class="manifesto">
+  <div class="zh">反正都會被誤解 —— 咁不如完全放鬆。</div>
+  <div class="en"><b>My naturalness reads as arrogance — structurally, by 世俗 definition. That tint is not mine to choose:</b> the only switch I hold is perform / don't perform. What the unedited signal looks like at the receiver was never on the menu. So the label isn't feedback to fix — it's weather. And weather is not worth one degree of muscle tension.</div>
+  <div class="en">Stop paying for legibility nobody will decode anyway. Spend that budget on the one thing the majority can't do in this building: <b>full parasympathetic release, on the clock</b>. Their misunderstanding is my licence. 用副交感神經放鬆去醫病.</div>
+  <div class="en" style="margin-top:10px;font-family:var(--disp);font-style:italic;font-size:14.5px;color:var(--brass)">Performing for no one but myself, all the time.</div>
+</div>
+
+<div id="status">Loading record…</div>
+
+<div class="stats">
+  <div class="stat"><b id="streak">–</b><span>day streak</span></div>
+  <div class="stat"><b id="total">–</b><span>resets</span></div>
+  <div class="stat"><b id="avg">–</b><span>14d score</span></div>
+  <div class="stat"><b id="convTotal">–</b><span>誤解→放鬆</span></div>
+</div>
+
+<div class="card">
+  <div class="lbl" id="todayLbl">Today</div>
+  <div class="sessions">
+    <button class="sess" id="s-am"><span class="zh">朝</span><span class="t">Morning</span></button>
+    <button class="sess" id="s-md"><span class="zh">午</span><span class="t">Midday</span></button>
+    <button class="sess" id="s-pm"><span class="zh">晏</span><span class="t">Afternoon</span></button>
+  </div>
+  <p class="hint">A reset = <b>2–5 min</b>: exhale-longer breathing (4 in / 8 out), shoulders released, feathering rhythm. Tap when done.</p>
+</div>
+
+<div class="card">
+  <div class="lbl">誤解 → 放鬆 converter</div>
+  <div class="convert">
+    <button id="convBtn">Misread me? → released deeper</button>
+    <div class="count"><b id="convToday">0</b><span>today</span></div>
+    <button class="ghost" id="convUndo" title="Remove one (mistap)">−1</button>
+  </div>
+  <p class="hint">Each time you notice the label landing — a look, a comment, a containment move — log it here and let it <b>trigger</b> a release instead of a defence. The tax they think you're paying is the dividend you're collecting.</p>
+</div>
+
+<div class="card">
+  <div class="lbl">Relaxation quality today · 1–10 (movement-rating standard)</div>
+  <div class="scoreRow" id="scoreRow"></div>
+</div>
+
+<div class="card">
+  <div class="lbl">Body ledger — kept lean, but kept</div>
+  <button class="tog" id="tHead">Headache / aura today</button>
+  <p class="hint">This is the outcome variable of the whole experiment — and the dated recurrence record your doctors will ask for. Empty months here are the result you're playing for.</p>
+</div>
+
+<div class="card">
+  <div class="lbl">Note (optional — triggers, wins, one line)</div>
+  <textarea id="note" placeholder="e.g. stayed loose through 3pm meeting / wine+heat avoided…"></textarea>
+</div>
+
+<button class="save" id="saveBtn">Save today's record</button>
+
+<div class="card" style="margin-top:22px">
+  <div class="lbl">Last 28 days</div>
+  <div class="grid" id="grid"></div>
+  <div class="legend">
+    <span><i style="background:rgba(201,162,39,.14)"></i>1 reset</span>
+    <span><i style="background:rgba(201,162,39,.32)"></i>2</span>
+    <span><i style="background:rgba(201,162,39,.58)"></i>3</span>
+    <span><i style="box-shadow:inset 0 0 0 1.5px var(--red)"></i>headache day</span>
+  </div>
+</div>
+
+<div class="foot">
+  <span>private record · stored on this device only</span>
+  <div>
+    <button class="ghost" id="exportBtn">Export backup</button>
+    <button class="ghost" id="importBtn">Import</button>
+    <button class="ghost" id="resetBtn">Clear all</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+(function(){
+  const KEY='pns-office-tracker-v1'; /* same key as the original instrument */
+
+  /* ---- storage adapter ----
+     Uses the artifact host's window.storage when present; otherwise falls back
+     to this device's localStorage. Same key either way, so an exported backup
+     from one can be imported into the other. */
+  const store = {
+    async get(k){
+      if(window.storage && window.storage.get) return await window.storage.get(k);
+      const v=localStorage.getItem(k);
+      if(v===null) return null;
+      return {key:k, value:v};
+    },
+    async set(k,v){
+      if(window.storage && window.storage.set) return await window.storage.set(k,v);
+      localStorage.setItem(k,v);
+      return {key:k, value:v};
+    }
+  };
+  let data={days:{}};
+  let today=localDate(new Date());
+  const $=id=>document.getElementById(id);
+  const status=$('status');
+
+  function localDate(d){
+    const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
+    return y+'-'+m+'-'+dd;
+  }
+  function day(k){
+    if(!data.days[k]) data.days[k]={sessions:{},score:null,headache:false,note:'',conv:0};
+    if(data.days[k].conv===undefined) data.days[k].conv=0; /* migrate old logs */
+    return data.days[k];
+  }
+  function setStatus(msg,err){ status.textContent=msg||''; status.className=err?'err':''; }
+
+  async function load(){
+    try{
+      const res=await store.get(KEY);
+      if(res&&res.value){ data=JSON.parse(res.value); setStatus('Record loaded ✓ · '+today); }
+      else setStatus('New record started · '+today);
+    }catch(e){
+      setStatus('New record started · '+today);
+    }
+    render();
+  }
+
+  let saveTimer=null;
+  async function persist(showMsg){
+    try{
+      const res=await store.set(KEY, JSON.stringify(data));
+      if(!res) throw new Error('no result');
+      if(showMsg) setStatus('Saved ✓ · '+new Date().toLocaleTimeString());
+    }catch(e){
+      setStatus('Save failed — will retry on next action. Data kept in this session.', true);
+    }
+  }
+  function queueSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>persist(false),400); }
+
+  const sessIds={am:'s-am',md:'s-md',pm:'s-pm'};
+  function render(){
+    today=localDate(new Date());
+    const t=day(today);
+    $('todayLbl').textContent='Today · '+today;
+
+    Object.keys(sessIds).forEach(k=>{
+      $(sessIds[k]).classList.toggle('done', !!t.sessions[k]);
+    });
+
+    const row=$('scoreRow'); row.innerHTML='';
+    for(let i=1;i<=10;i++){
+      const b=document.createElement('button');
+      b.textContent=i;
+      if(t.score===i) b.classList.add('sel');
+      b.addEventListener('click',()=>{ t.score=(t.score===i?null:i); render(); queueSave(); });
+      row.appendChild(b);
+    }
+
+    $('tHead').classList.toggle('on', !!t.headache);
+    $('convToday').textContent=t.conv||0;
+    if(document.activeElement!==$('note')) $('note').value=t.note||'';
+
+    renderStats(); renderGrid();
+  }
+
+  function renderStats(){
+    let streak=0; let d=new Date();
+    const todayHas=Object.values(day(today).sessions).some(Boolean);
+    if(!todayHas) d.setDate(d.getDate()-1);
+    for(;;){
+      const k=localDate(d); const rec=data.days[k];
+      if(rec&&Object.values(rec.sessions||{}).some(Boolean)){ streak++; d.setDate(d.getDate()-1); }
+      else break;
+    }
+    $('streak').textContent=streak;
+
+    let total=0, scoreSum=0, scoreN=0, convAll=0;
+    const cutoff=localDate((()=>{const c=new Date();c.setDate(c.getDate()-13);return c;})());
+    Object.keys(data.days).forEach(k=>{
+      const rec=data.days[k];
+      total+=Object.values(rec.sessions||{}).filter(Boolean).length;
+      convAll+=rec.conv||0;
+      if(rec.score && k>=cutoff){ scoreSum+=rec.score; scoreN++; }
+    });
+    $('total').textContent=total;
+    $('avg').textContent=scoreN? (scoreSum/scoreN).toFixed(1) : '–';
+    $('convTotal').textContent=convAll;
+  }
+
+  function renderGrid(){
+    const g=$('grid'); g.innerHTML='';
+    const start=new Date(); start.setDate(start.getDate()-27);
+    for(let i=0;i<28;i++){
+      const d=new Date(start); d.setDate(start.getDate()+i);
+      const k=localDate(d); const rec=data.days[k];
+      const n=rec?Object.values(rec.sessions||{}).filter(Boolean).length:0;
+      const cell=document.createElement('div');
+      cell.className='day'+(n>=3?' l3':n===2?' l2':n===1?' l1':'')+(rec&&rec.headache?' hd':'');
+      cell.innerHTML='<b>'+d.getDate()+'</b>'+(rec&&rec.score?('<span>'+rec.score+'</span>'):'');
+      cell.title=k+(rec?(' · '+n+' resets'+(rec.score?' · score '+rec.score:'')+(rec.conv?(' · '+rec.conv+' conversions'):'')):'');
+      g.appendChild(cell);
+    }
+  }
+
+  Object.keys(sessIds).forEach(k=>{
+    $(sessIds[k]).addEventListener('click',()=>{
+      const t=day(today);
+      t.sessions[k]=t.sessions[k]?false:new Date().toLocaleTimeString();
+      render(); queueSave();
+    });
+  });
+  $('convBtn').addEventListener('click',()=>{
+    const t=day(today); t.conv=(t.conv||0)+1; render(); queueSave();
+    setStatus('Conversion logged — misread received, tension released.');
+  });
+  $('convUndo').addEventListener('click',()=>{
+    const t=day(today);
+    if((t.conv||0)>0){ t.conv--; render(); queueSave(); setStatus('One conversion removed.'); }
+  });
+  $('tHead').addEventListener('click',()=>{ const t=day(today); t.headache=!t.headache; render(); queueSave(); });
+  $('note').addEventListener('input',()=>{ day(today).note=$('note').value; queueSave(); });
+  $('saveBtn').addEventListener('click',()=>persist(true));
+
+  $('exportBtn').addEventListener('click',async ()=>{
+    try{
+      const text=JSON.stringify(data,null,2);
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+        setStatus('Backup copied to clipboard ✓ — paste anywhere safe.');
+      }else{
+        prompt('Copy your backup JSON:', text);
+      }
+    }catch(e){ prompt('Copy your backup JSON:', JSON.stringify(data)); }
+  });
+
+  $('resetBtn').addEventListener('click',async ()=>{
+    if(!confirm('Clear the entire record? This cannot be undone.')) return;
+    data={days:{}};
+    try{ await store.set(KEY, JSON.stringify(data)); setStatus('Record cleared.'); }
+    catch(e){ setStatus('Clear failed — try again.', true); }
+    render();
+  });
+
+  $('importBtn').addEventListener('click',async ()=>{
+    const raw=prompt('Paste a backup JSON here to restore. This REPLACES the current record.');
+    if(!raw) return;
+    try{
+      const parsed=JSON.parse(raw);
+      if(!parsed || typeof parsed!=='object' || !parsed.days) throw new Error('shape');
+      data=parsed;
+      await persist(false);
+      render();
+      setStatus('Backup imported ✓ · '+Object.keys(data.days).length+' days restored.');
+    }catch(e){
+      setStatus('Import failed — that did not look like a valid backup.', true);
+    }
+  });
+
+  setInterval(()=>{ if(localDate(new Date())!==today){ render(); } }, 60000);
+
+  load();
+
+  /* register the worker (needed for desktop "Install app"); network-first,
+     so a stale cache can never shadow an updated file. */
+  if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+})();
+</script>
+</body>
+</html>
