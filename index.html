@@ -37,9 +37,27 @@
   .manifesto .zh{font-family:var(--disp);font-size:18px;line-height:1.6;color:var(--chalk)}
   .manifesto .en{font-size:12.5px;color:var(--dim);margin-top:8px}
   .manifesto .en b{color:var(--brass);font-weight:500}
+  .manifesto .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .manifesto .info{border-color:rgba(201,162,39,.45);color:var(--brass)}
 
-  .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+  .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;
+       display:flex;align-items:center;justify-content:space-between;gap:10px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px}
+
+  /* info toggle + expandable detail */
+  .info{
+    flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);
+    background:transparent;color:var(--dim);font-family:var(--disp);font-style:italic;
+    font-size:12.5px;line-height:1;cursor:pointer;
+  }
+  .info[aria-expanded="true"]{border-color:var(--brass);color:var(--brass)}
+  .detail{display:none;font-size:12.5px;line-height:1.62;color:var(--dim);
+    margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+  .detail.open{display:block}
+  .detail p+p{margin-top:9px}
+  .detail b{color:var(--brass);font-weight:500}
+  .keys{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--dim);margin-top:12px}
+  .keys b{color:var(--chalk);font-weight:500}
 
   #status{font-family:var(--mono);font-size:11px;color:var(--dim);min-height:16px;margin-bottom:14px}
   #status.err{color:var(--red)}
@@ -60,8 +78,6 @@
   .sess.done{background:rgba(201,162,39,.10);border-color:var(--brass)}
   .sess.done .t{color:var(--brass)}
   .sess.done::after{content:"✓ logged";font-family:var(--mono);font-size:9.5px;color:var(--ok)}
-  .hint{font-size:12.5px;color:var(--dim);margin-top:12px}
-  .hint b{color:var(--brass);font-weight:500}
 
   /* misread converter */
   .convert{display:flex;align-items:center;gap:14px}
@@ -123,15 +139,20 @@
 <div class="wrap">
 
 <header>
-  <div class="stamp">Companion instrument · WYK-01 · daily habit record</div>
+  <div class="stamp">WYK-01 · daily record</div>
   <h1>副交感放鬆 <em>office reset</em></h1>
 </header>
 
 <div class="manifesto">
-  <div class="zh">反正都會被誤解 —— 咁不如完全放鬆。</div>
-  <div class="en"><b>The label isn't feedback to fix — it's weather.</b> My only switch is perform / don't perform; how the unedited signal lands was never on the menu. Weather isn't worth one degree of muscle tension.</div>
-  <div class="en">So stop paying for legibility nobody will decode. Spend it on <b>full parasympathetic release, on the clock</b>. 用副交感神經放鬆去醫病。</div>
+  <div class="top">
+    <div class="zh">反正都會被誤解 —— 咁不如完全放鬆。</div>
+    <button class="info" id="i-all" aria-expanded="false" title="Show / hide all descriptions">i</button>
+  </div>
   <div class="en" style="margin-top:10px;font-family:var(--disp);font-style:italic;font-size:14.5px;color:var(--brass)">Performing for no one but myself, all the time.</div>
+  <div class="detail" id="d-man">
+    <p><b>My naturalness reads as arrogance — structurally, by 世俗 definition. That tint is not mine to choose:</b> the only switch I hold is perform / don't perform. What the unedited signal looks like at the receiver was never on the menu. So the label isn't feedback to fix — it's weather. And weather is not worth one degree of muscle tension.</p>
+    <p>Stop paying for legibility nobody will decode anyway. Spend that budget on the one thing the majority can't do in this building: <b>full parasympathetic release, on the clock</b>. Their misunderstanding is my licence. 用副交感神經放鬆去醫病。</p>
+  </div>
 </div>
 
 <div id="status">Loading record…</div>
@@ -139,47 +160,62 @@
 <div class="stats">
   <div class="stat"><b id="streak">–</b><span>day streak</span></div>
   <div class="stat"><b id="total">–</b><span>resets</span></div>
-  <div class="stat"><b id="avg">–</b><span>14d score</span></div>
-  <div class="stat"><b id="convTotal">–</b><span>誤解→放鬆</span></div>
+  <div class="stat"><b id="avg">–</b><span>14d</span></div>
+  <div class="stat"><b id="convTotal">–</b><span>誤解→鬆</span></div>
 </div>
 
 <div class="card">
-  <div class="lbl" id="todayLbl">Today</div>
+  <div class="lbl"><span id="todayLbl">Today</span><button class="info" data-target="d-reset" aria-expanded="false" title="What counts as a reset">i</button></div>
   <div class="sessions">
     <button class="sess" id="s-am"><span class="zh">朝</span><span class="t">Morning</span></button>
     <button class="sess" id="s-md"><span class="zh">午</span><span class="t">Midday</span></button>
     <button class="sess" id="s-pm"><span class="zh">晏</span><span class="t">Afternoon</span></button>
   </div>
-  <p class="hint">A reset = <b>2–5 min</b>: 4 in / 8 out, shoulders released. Tap when done.</p>
+  <p class="keys"><b>2–5 min</b> · 4 in / 8 out · shoulders down</p>
+  <div class="detail" id="d-reset">
+    <p>A reset = <b>2–5 min</b>: exhale-longer breathing (4 in / 8 out), shoulders released, feathering rhythm. Tap the block when done — tap again to undo.</p>
+  </div>
 </div>
 
 <div class="card">
-  <div class="lbl">誤解 → 放鬆 converter</div>
+  <div class="lbl"><span>誤解 → 放鬆</span><button class="info" data-target="d-conv" aria-expanded="false" title="How the converter works">i</button></div>
   <div class="convert">
-    <button id="convBtn">Misread me? → released deeper</button>
+    <button id="convBtn">誤解 → 放鬆 +1</button>
     <div class="count"><b id="convToday">0</b><span>today</span></div>
     <button class="ghost" id="convUndo" title="Remove one (mistap)">−1</button>
   </div>
-  <p class="hint">Notice the label landing — a look, a comment — log it, and let it <b>trigger a release, not a defence</b>.</p>
+  <p class="keys">look · comment · containment → <b>release, not defence</b></p>
+  <div class="detail" id="d-conv">
+    <p>Each time you notice the label landing — a look, a comment, a containment move — log it here and let it <b>trigger</b> a release instead of a defence. The tax they think you're paying is the dividend you're collecting. Their misunderstanding is my licence.</p>
+  </div>
 </div>
 
 <div class="card">
-  <div class="lbl">Relaxation quality today · 1–10</div>
+  <div class="lbl"><span>放鬆質素 · 1–10</span><button class="info" data-target="d-score" aria-expanded="false" title="How to score">i</button></div>
   <div class="scoreRow" id="scoreRow"></div>
+  <div class="detail" id="d-score">
+    <p>Relaxation quality for the day, on the <b>movement-rating standard</b>. 1 = braced from open to close, 10 = fully released on the clock. Tap the same number again to clear it.</p>
+  </div>
 </div>
 
 <div class="card">
-  <div class="lbl">Body ledger</div>
-  <button class="tog" id="tHead">Headache / aura today</button>
-  <p class="hint">The outcome variable — and the dated record your doctors will ask for. Empty months are the win.</p>
+  <div class="lbl"><span>Body ledger</span><button class="info" data-target="d-body" aria-expanded="false" title="Why this is tracked">i</button></div>
+  <button class="tog" id="tHead">Headache / aura</button>
+  <p class="keys">outcome variable · <b>empty months = the win</b></p>
+  <div class="detail" id="d-body">
+    <p>Kept lean, but kept. This is the outcome variable of the whole experiment — and the dated recurrence record your doctors will ask for. Empty months here are the result you're playing for.</p>
+  </div>
 </div>
 
 <div class="card">
-  <div class="lbl">Note (optional — triggers, wins, one line)</div>
-  <textarea id="note" placeholder="e.g. stayed loose through 3pm meeting / wine+heat avoided…"></textarea>
+  <div class="lbl"><span>Note</span><button class="info" data-target="d-note" aria-expanded="false" title="What to note">i</button></div>
+  <textarea id="note" placeholder="trigger · win · one line"></textarea>
+  <div class="detail" id="d-note">
+    <p>Optional. One line is enough — the trigger that landed, the win you kept, or a cofactor worth remembering (wine, heat, sleep debt).</p>
+  </div>
 </div>
 
-<button class="save" id="saveBtn">Save today's record</button>
+<button class="save" id="saveBtn">Save</button>
 
 <div class="card" style="margin-top:22px">
   <div class="lbl">Last 28 days</div>
@@ -188,16 +224,16 @@
     <span><i style="background:rgba(201,162,39,.14)"></i>1 reset</span>
     <span><i style="background:rgba(201,162,39,.32)"></i>2</span>
     <span><i style="background:rgba(201,162,39,.58)"></i>3</span>
-    <span><i style="box-shadow:inset 0 0 0 1.5px var(--red)"></i>headache day</span>
+    <span><i style="box-shadow:inset 0 0 0 1.5px var(--red)"></i>headache</span>
   </div>
 </div>
 
 <div class="foot">
-  <span>private record · stored on this device only</span>
+  <span>private · this device only</span>
   <div>
-    <button class="ghost" id="exportBtn">Export backup</button>
+    <button class="ghost" id="exportBtn">Export</button>
     <button class="ghost" id="importBtn">Import</button>
-    <button class="ghost" id="resetBtn">Clear all</button>
+    <button class="ghost" id="resetBtn">Clear</button>
   </div>
 </div>
 
@@ -380,6 +416,28 @@
     }catch(e){
       setStatus('Import failed — that did not look like a valid backup.', true);
     }
+  });
+
+  /* ---- info toggles ----
+     Each card's "i" opens its own detail; the manifesto "i" opens every one. */
+  const infoBtns=[...document.querySelectorAll('.info[data-target]')];
+  const allBtn=$('i-all');
+  function setAllBtn(){
+    const anyOpen=[...document.querySelectorAll('.detail')].some(d=>d.classList.contains('open'));
+    allBtn.setAttribute('aria-expanded', anyOpen?'true':'false');
+  }
+  infoBtns.forEach(b=>{
+    b.addEventListener('click',()=>{
+      const open=$(b.dataset.target).classList.toggle('open');
+      b.setAttribute('aria-expanded', open?'true':'false');
+      setAllBtn();
+    });
+  });
+  allBtn.addEventListener('click',()=>{
+    const open=allBtn.getAttribute('aria-expanded')!=='true';
+    document.querySelectorAll('.detail').forEach(d=>d.classList.toggle('open',open));
+    infoBtns.forEach(b=>b.setAttribute('aria-expanded', open?'true':'false'));
+    allBtn.setAttribute('aria-expanded', open?'true':'false');
   });
 
   setInterval(()=>{ if(localDate(new Date())!==today){ render(); } }, 60000);
