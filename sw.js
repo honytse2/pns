@@ -1,9 +1,9 @@
-/* 副交感 · Office Reset Tracker — service worker
+/* 底線 · Bottom Line — service worker
    Minimal and self-replacing. A fetch handler is required for Chrome to offer
    "Install app" on desktop. Bump CACHE (v3 -> v4 ...) whenever index.html changes,
    then open the app twice so the new version takes over. */
 
-const CACHE = 'pns-reset-v3';
+const CACHE = 'pns-reset-v4';
 
 self.addEventListener('install', event => {
   event.waitUntil(

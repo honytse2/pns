@@ -1,7 +1,7 @@
 {
-  "name": "副交感放鬆 · Office Reset Tracker",
-  "short_name": "副交感",
-  "description": "Daily parasympathetic reset tracker. Private, offline, stored on this device.",
+  "name": "底線 · Bottom Line",
+  "short_name": "底線",
+  "description": "Daily bottom-line values ledger. Private, offline, stored on this device.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
