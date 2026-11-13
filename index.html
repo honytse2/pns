@@ -113,6 +113,35 @@
   .legend{display:flex;gap:14px;margin-top:10px;font-family:var(--mono);font-size:9.5px;color:var(--dim);flex-wrap:wrap}
   .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
 
+  /* welcome-back line */
+  .back{border-left:2px solid var(--brass);padding:4px 0 4px 12px;margin-bottom:16px;font-size:13.5px;color:var(--chalk)}
+  .back b{color:var(--brass);font-weight:500}
+
+  /* guided reset */
+  .breathe{
+    width:100%;margin-top:12px;border:1px solid var(--brass);border-radius:8px;background:rgba(201,162,39,.10);
+    color:var(--brass);font-family:var(--sans);font-weight:500;font-size:14px;padding:13px;cursor:pointer;
+  }
+  .breathe:active{background:rgba(201,162,39,.2)}
+  #guide{
+    position:fixed;inset:0;background:rgba(5,5,6,.97);z-index:10;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:28px;padding:24px;
+  }
+  #guide[hidden]{display:none}
+  .orb{
+    width:120px;height:120px;border-radius:50%;border:1px solid var(--brass);
+    background:radial-gradient(circle,rgba(201,162,39,.35),rgba(201,162,39,.05));
+    transform:scale(.6);transition-property:transform;transition-timing-function:ease-in-out;
+  }
+  .phase{font-family:var(--disp);font-size:26px;font-weight:300;min-height:36px}
+  .clock{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--dim)}
+  .gbtns{display:flex;gap:10px}
+  .gbtns button{
+    border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--dim);
+    font-family:var(--sans);font-size:13px;padding:11px 18px;cursor:pointer;
+  }
+  .gbtns button.go{border-color:var(--brass);color:var(--brass)}
+
   .foot{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
   .foot span{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--dim)}
   .ghost{background:none;border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:6px;cursor:pointer}
@@ -134,6 +163,8 @@
   <div class="en" style="margin-top:10px;font-family:var(--disp);font-style:italic;font-size:14.5px;color:var(--brass)">Performing for no one but myself, all the time.</div>
 </div>
 
+<div class="back" id="back" hidden></div>
+
 <div id="status">Loading record…</div>
 
 <div class="stats">
@@ -150,7 +181,8 @@
     <button class="sess" id="s-md"><span class="zh">午</span><span class="t">Midday</span></button>
     <button class="sess" id="s-pm"><span class="zh">晏</span><span class="t">Afternoon</span></button>
   </div>
-  <p class="hint">A reset = <b>2–5 min</b>: 4 in / 8 out, shoulders released. Tap when done.</p>
+  <button class="breathe" id="breatheBtn">Start a 2-min reset · 4 in / 8 out</button>
+  <p class="hint">A reset = <b>2–5 min</b>: 4 in / 8 out, shoulders released. Tap when done — or let the guide log it for you.</p>
 </div>
 
 <div class="card">
@@ -195,12 +227,23 @@
 <div class="foot">
   <span>private record · stored on this device only</span>
   <div>
+    <button class="ghost" id="remindBtn">Add reminders</button>
     <button class="ghost" id="exportBtn">Export backup</button>
     <button class="ghost" id="importBtn">Import</button>
     <button class="ghost" id="resetBtn">Clear all</button>
   </div>
 </div>
 
+</div>
+
+<div id="guide" hidden role="dialog" aria-label="Guided reset">
+  <div class="orb" id="orb"></div>
+  <div class="phase" id="phase">Ready</div>
+  <div class="clock" id="clock">2:00</div>
+  <div class="gbtns">
+    <button id="gStop">Stop</button>
+    <button class="go" id="gDone" hidden>Finish &amp; log</button>
+  </div>
 </div>
 
 <script>
@@ -286,7 +329,20 @@
     $('convToday').textContent=t.conv||0;
     if(document.activeElement!==$('note')) $('note').value=t.note||'';
 
-    renderStats(); renderGrid();
+    renderStats(); renderGrid(); renderBack();
+  }
+
+  /* welcome-back: after a gap, say so plainly instead of just showing streak 0 */
+  function renderBack(){
+    const box=$('back');
+    if(Object.values(day(today).sessions).some(Boolean)){ box.hidden=true; return; }
+    const past=Object.keys(data.days).filter(k=>k<today && Object.values(data.days[k].sessions||{}).some(Boolean)).sort();
+    if(!past.length){ box.hidden=true; return; }
+    const last=past[past.length-1];
+    const gap=Math.round((new Date(today+'T00:00')-new Date(last+'T00:00'))/86400000);
+    if(gap<2){ box.hidden=true; return; }
+    box.innerHTML='Welcome back. Last reset was <b>'+gap+' days ago</b> — one 2-minute reset restarts the record.';
+    box.hidden=false;
   }
 
   function renderStats(){
@@ -380,6 +436,84 @@
     }catch(e){
       setStatus('Import failed — that did not look like a valid backup.', true);
     }
+  });
+
+  /* ---- guided reset: 4 in / 8 out for 2 minutes, then logs the session ---- */
+  const IN=4, OUT=8, TOTAL=120;
+  let gTimer=null, gStart=0, wake=null;
+  function slotNow(){
+    const h=new Date().getHours();
+    const pref=h<12?'am':h<15?'md':'pm';
+    const t=day(today);
+    if(!t.sessions[pref]) return pref;
+    return ['am','md','pm'].find(k=>!t.sessions[k]) || null;
+  }
+  function fmt(s){ s=Math.max(0,Math.ceil(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+  function breath(inhale){
+    const orb=$('orb');
+    orb.style.transitionDuration=(inhale?IN:OUT)+'s';
+    orb.style.transform=inhale?'scale(1.25)':'scale(.6)';
+    $('phase').textContent=inhale?'Breathe in':'Out · let the shoulders drop';
+    if(navigator.vibrate) navigator.vibrate(inhale?30:15);
+  }
+  function openGuide(){
+    $('guide').hidden=false; $('gDone').hidden=true;
+    if(navigator.wakeLock) navigator.wakeLock.request('screen').then(w=>{ if(gTimer) wake=w; else w.release().catch(()=>{}); }).catch(()=>{});
+    gStart=Date.now(); let lastPhase=null;
+    const tick=()=>{
+      const el=(Date.now()-gStart)/1000;
+      const inhale=(el%(IN+OUT))<IN;
+      if(inhale!==lastPhase){ breath(inhale); lastPhase=inhale; }
+      $('clock').textContent=fmt(TOTAL-el);
+      if(el>=60) $('gDone').hidden=false;
+      if(el>=TOTAL) closeGuide(true);
+    };
+    tick(); gTimer=setInterval(tick,250);
+  }
+  function closeGuide(log){
+    clearInterval(gTimer); gTimer=null;
+    if(wake){ wake.release().catch(()=>{}); wake=null; }
+    $('guide').hidden=true; $('orb').style.transitionDuration='0s'; $('orb').style.transform='scale(.6)';
+    if(!log) return;
+    const k=slotNow();
+    if(k){
+      day(today).sessions[k]=new Date().toLocaleTimeString();
+      render(); queueSave();
+      setStatus('Reset logged ✓ · '+({am:'morning',md:'midday',pm:'afternoon'})[k]);
+    }else{
+      setStatus('Reset done — all three already logged today.');
+    }
+  }
+  $('breatheBtn').addEventListener('click',openGuide);
+  $('gStop').addEventListener('click',()=>closeGuide(false));
+  $('gDone').addEventListener('click',()=>closeGuide(true));
+
+  /* ---- reminders: a calendar file with three weekday nudges that link back here ---- */
+  $('remindBtn').addEventListener('click',()=>{
+    const url=location.href.split('#')[0];
+    const d=new Date(); const ymd=localDate(d).replace(/-/g,'');
+    const slots=[['1030','朝 · morning reset'],['1330','午 · midday reset'],['1600','晏 · afternoon reset']];
+    const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//pns//office reset//EN','CALSCALE:GREGORIAN'];
+    slots.forEach((s,i)=>{
+      lines.push('BEGIN:VEVENT',
+        'UID:pns-reset-'+i+'-'+ymd+'@pns',
+        'DTSTAMP:'+ymd+'T000000Z',
+        'DTSTART:'+ymd+'T'+s[0]+'00',
+        'DURATION:PT5M',
+        'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR',
+        'SUMMARY:'+s[1],
+        'DESCRIPTION:4 in / 8 out\\, shoulders released. '+url,
+        'URL:'+url,
+        'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+s[1],'TRIGGER:PT0M','END:VALARM',
+        'END:VEVENT');
+    });
+    lines.push('END:VCALENDAR');
+    const blob=new Blob([lines.join('\r\n')],{type:'text/calendar'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='pns-reset-reminders.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    setStatus('Reminder file created — open it to add 10:30 · 13:30 · 16:00 weekday nudges to your calendar.');
   });
 
   setInterval(()=>{ if(localDate(new Date())!==today){ render(); } }, 60000);
