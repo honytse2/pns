@@ -3,20 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>底線 · Bottom Line</title>
+<title>副交感 · Office Reset Tracker</title>
 <meta name="theme-color" content="#0A0A0B">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="description" content="Daily bottom-line values ledger — private, offline, stored on this device.">
+<meta name="description" content="Daily parasympathetic reset tracker — private, offline, stored on this device.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="底線">
+<meta name="apple-mobile-web-app-title" content="副交感">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0A0A0B; --panel:#121214; --line:#26262A;
     --chalk:#EDEAE2; --dim:#8E8E96; --brass:#C9A227; --red:#C05050; --ok:#7FB069;
-    --love:#D98A6A; --passion:#6FA98C; --free:#C9A227;
     --mono:'IBM Plex Mono',ui-monospace,monospace;
     --sans:'IBM Plex Sans','PingFang HK','Noto Sans TC',sans-serif;
     --disp:'Fraunces','Noto Serif TC',serif;
@@ -30,14 +29,14 @@
   h1{font-family:var(--disp);font-weight:300;font-size:30px;line-height:1.15}
   h1 em{font-style:italic;color:var(--brass)}
 
+  /* manifesto */
   .manifesto{
     border:1px solid var(--brass);border-radius:8px;background:linear-gradient(180deg,rgba(201,162,39,.10),rgba(201,162,39,.03));
     padding:16px 18px;margin-bottom:18px;
   }
-  .manifesto ol{list-style:none;font-family:var(--disp);font-size:17px;line-height:1.5}
-  .manifesto li{display:flex;gap:10px;align-items:baseline;padding:2px 0}
-  .manifesto li i{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--brass);min-width:14px}
-  .manifesto .en{font-size:12.5px;color:var(--dim);margin-top:10px}
+  .manifesto .zh{font-family:var(--disp);font-size:18px;line-height:1.6;color:var(--chalk)}
+  .manifesto .en{font-size:12.5px;color:var(--dim);margin-top:8px}
+  .manifesto .en b{color:var(--brass);font-weight:500}
 
   .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px}
@@ -45,106 +44,103 @@
   #status{font-family:var(--mono);font-size:11px;color:var(--dim);min-height:16px;margin-bottom:14px}
   #status.err{color:var(--red)}
 
-  .intent{border-left:2px solid var(--brass);padding:4px 0 4px 14px;margin-bottom:16px}
-  .intent .lbl{margin-bottom:4px}
-  .intent p{font-family:var(--disp);font-size:18px;line-height:1.4}
-
   .stats{display:flex;gap:10px;margin-bottom:16px}
-  .stat{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:13px 6px;text-align:center}
+  .stat{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:13px 8px;text-align:center}
   .stat b{display:block;font-family:var(--mono);font-size:22px;font-weight:500;color:var(--brass)}
-  .stat span{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
-
-  /* value cards */
-  .val{border-left-width:3px}
-  .val.love{border-left-color:var(--love)}
-  .val.passion{border-left-color:var(--passion)}
-  .val.free{border-left-color:var(--free)}
-  .vhead{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
-  .vhead .zh{font-family:var(--disp);font-size:24px;line-height:1}
-  .love .vhead .zh{color:var(--love)} .passion .vhead .zh{color:var(--passion)} .free .vhead .zh{color:var(--free)}
-  .vhead .ti{font-weight:500;font-size:14.5px;flex:1}
-  .vhead .n{font-family:var(--mono);font-size:12px;color:var(--dim)}
-  .addrow{display:flex;gap:8px}
-  input[type=text],textarea{
-    width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;
-    color:var(--chalk);font-family:var(--sans);font-size:16px;padding:12px;
-  }
-  textarea{min-height:60px;resize:vertical}
-  input[type=text]:focus,textarea:focus{outline:2px solid var(--brass);outline-offset:1px}
-  .add{
-    border:1px solid var(--brass);border-radius:8px;background:transparent;color:var(--brass);
-    font-family:var(--sans);font-weight:500;font-size:14px;padding:0 16px;cursor:pointer;white-space:nowrap;min-height:46px;
-  }
-  .add:active{background:rgba(201,162,39,.15)}
-  .mins{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-  .mins button,.scoreRow button{
-    min-width:40px;height:40px;padding:0 8px;border-radius:6px;border:1px solid var(--line);background:transparent;
-    color:var(--chalk);font-family:var(--mono);font-size:13px;cursor:pointer;
-  }
-  .mins button.sel{background:var(--passion);color:#0A0A0B;border-color:var(--passion);font-weight:500}
-  .scoreRow{display:flex;gap:6px;flex-wrap:wrap}
-  .scoreRow button.sel{background:var(--brass);color:#0A0A0B;border-color:var(--brass);font-weight:500}
-  .items{list-style:none;margin-top:10px}
-  .items li{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:14.5px}
-  .items li .tm{font-family:var(--mono);font-size:10.5px;color:var(--dim);min-width:38px}
-  .items li .tx{flex:1;overflow-wrap:anywhere}
-  .items li .mn{font-family:var(--mono);font-size:11px;color:var(--passion);white-space:nowrap}
-  .items li button{background:none;border:none;color:var(--dim);font-size:16px;cursor:pointer;padding:0 6px;line-height:1}
-  .hint{font-size:12.5px;color:var(--dim);margin-top:12px}
-  .hint b{color:var(--brass);font-weight:500}
-
-  details.card>summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
-  details.card>summary::-webkit-details-marker{display:none}
-  details.card>summary .lbl{margin:0}
-  details.card>summary::after{content:"+";font-family:var(--mono);color:var(--dim)}
-  details.card[open]>summary::after{content:"–"}
-  details.card[open]>summary{margin-bottom:14px}
-  .sub{margin-top:16px}
+  .stat span{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
 
   .sessions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
   .sess{
     border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--chalk);
-    font-family:var(--sans);font-weight:400;font-size:13px;padding:12px 6px;cursor:pointer;
-    display:flex;flex-direction:column;gap:4px;align-items:center;
+    font-family:var(--sans);font-weight:400;font-size:13px;padding:16px 6px;cursor:pointer;
+    display:flex;flex-direction:column;gap:6px;align-items:center;transition:border-color .15s, background .15s;
   }
   .sess .zh{font-family:var(--disp);font-size:15px}
   .sess .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
   .sess.done{background:rgba(201,162,39,.10);border-color:var(--brass)}
   .sess.done .t{color:var(--brass)}
+  .sess.done::after{content:"✓ logged";font-family:var(--mono);font-size:9.5px;color:var(--ok)}
+  .hint{font-size:12.5px;color:var(--dim);margin-top:12px}
+  .hint b{color:var(--brass);font-weight:500}
+
+  /* misread converter */
   .convert{display:flex;align-items:center;gap:14px}
-  .convert .add{flex:1;padding:12px 16px}
-  .convert .count{font-family:var(--mono);font-size:22px;color:var(--brass);min-width:36px;text-align:center}
+  .convert button{
+    border:1px solid var(--brass);border-radius:8px;background:transparent;color:var(--brass);
+    font-family:var(--sans);font-weight:500;font-size:13.5px;padding:14px 16px;cursor:pointer;flex:1;
+  }
+  .convert button:active{background:rgba(201,162,39,.15)}
+  .convert .count{font-family:var(--mono);font-size:26px;color:var(--brass);min-width:44px;text-align:center}
+  .convert .count span{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+
+  .scoreRow{display:flex;gap:6px;flex-wrap:wrap}
+  .scoreRow button{
+    width:40px;height:40px;border-radius:6px;border:1px solid var(--line);background:transparent;
+    color:var(--chalk);font-family:var(--mono);font-size:14px;cursor:pointer;
+  }
+  .scoreRow button.sel{background:var(--brass);color:#0A0A0B;border-color:var(--brass);font-weight:500}
+
   .tog{
     width:100%;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--dim);
     font-family:var(--sans);font-size:13px;padding:12px;cursor:pointer;
   }
   .tog.on{border-color:var(--red);color:var(--chalk);background:rgba(192,80,80,.12)}
 
+  textarea{
+    width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;
+    color:var(--chalk);font-family:var(--sans);font-size:14px;padding:12px;min-height:60px;resize:vertical;
+  }
+  textarea:focus{outline:2px solid var(--brass);outline-offset:1px}
+
+  .save{
+    width:100%;background:var(--brass);color:#0A0A0B;border:none;border-radius:8px;
+    font-family:var(--sans);font-weight:600;font-size:15px;padding:15px;cursor:pointer;margin-top:4px;
+  }
+  .save:active{opacity:.85}
+
   .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
   .day{
     aspect-ratio:1;border-radius:6px;border:1px solid var(--line);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
     font-family:var(--mono);font-size:9px;color:var(--dim);
   }
   .day b{font-size:12px;font-weight:500;color:var(--chalk)}
-  .day.l1{background:rgba(237,234,226,.04)}
-  .day.l2{background:rgba(237,234,226,.08)}
-  .day.l3{background:rgba(201,162,39,.20);border-color:var(--brass)}
+  .day.l1{background:rgba(201,162,39,.14)}
+  .day.l2{background:rgba(201,162,39,.32)}
+  .day.l3{background:rgba(201,162,39,.58)}
+  .day.l3 b{color:#0A0A0B}
   .day.hd{box-shadow:inset 0 0 0 1.5px var(--red)}
-  .dots{display:flex;gap:3px}
-  .dots i{width:5px;height:5px;border-radius:50%;background:var(--line)}
-  .dots i.a{background:var(--love)} .dots i.b{background:var(--passion)} .dots i.c{background:var(--free)}
   .legend{display:flex;gap:14px;margin-top:10px;font-family:var(--mono);font-size:9.5px;color:var(--dim);flex-wrap:wrap}
-  .legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
 
-  .ledger{list-style:none}
-  .ledger li{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
-  .ledger li:first-child{border-top:none}
-  .ledger .d{font-family:var(--mono);font-size:10.5px;color:var(--dim);min-width:40px}
-  .ledger .g{font-family:var(--disp);font-size:15px;min-width:18px}
-  .ledger .g.love{color:var(--love)} .ledger .g.passion{color:var(--passion)} .ledger .g.free{color:var(--free)}
-  .ledger .tx{flex:1;overflow-wrap:anywhere}
-  .empty{font-size:13px;color:var(--dim)}
+  /* welcome-back line */
+  .back{border-left:2px solid var(--brass);padding:4px 0 4px 12px;margin-bottom:16px;font-size:13.5px;color:var(--chalk)}
+  .back b{color:var(--brass);font-weight:500}
+
+  /* guided reset */
+  .breathe{
+    width:100%;margin-top:12px;border:1px solid var(--brass);border-radius:8px;background:rgba(201,162,39,.10);
+    color:var(--brass);font-family:var(--sans);font-weight:500;font-size:14px;padding:13px;cursor:pointer;
+  }
+  .breathe:active{background:rgba(201,162,39,.2)}
+  #guide{
+    position:fixed;inset:0;background:rgba(5,5,6,.97);z-index:10;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:28px;padding:24px;
+  }
+  #guide[hidden]{display:none}
+  .orb{
+    width:120px;height:120px;border-radius:50%;border:1px solid var(--brass);
+    background:radial-gradient(circle,rgba(201,162,39,.35),rgba(201,162,39,.05));
+    transform:scale(.6);transition-property:transform;transition-timing-function:ease-in-out;
+  }
+  .phase{font-family:var(--disp);font-size:26px;font-weight:300;min-height:36px}
+  .clock{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--dim)}
+  .gbtns{display:flex;gap:10px}
+  .gbtns button{
+    border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--dim);
+    font-family:var(--sans);font-size:13px;padding:11px 18px;cursor:pointer;
+  }
+  .gbtns button.go{border-color:var(--brass);color:var(--brass)}
 
   .foot{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
   .foot span{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--dim)}
@@ -156,114 +152,82 @@
 <div class="wrap">
 
 <header>
-  <div class="stamp">Dec-22 · daily ledger</div>
-  <h1>底線 <em>bottom line</em></h1>
+  <div class="stamp">Companion instrument · WYK-01 · daily habit record</div>
+  <h1>副交感放鬆 <em>office reset</em></h1>
 </header>
 
 <div class="manifesto">
-  <ol>
-    <li><i>1</i><span>Do good to the people I love.</span></li>
-    <li><i>2</i><span>Devote fully to my passion.</span></li>
-    <li><i>3</i><span>Ask no one's permission for 1 and 2.</span></li>
-  </ol>
-  <div class="en">Everything else is a tool. This page only counts what was actually done.</div>
+  <div class="zh">反正都會被誤解 —— 咁不如完全放鬆。</div>
+  <div class="en"><b>The label isn't feedback to fix — it's weather.</b> My only switch is perform / don't perform; how the unedited signal lands was never on the menu. Weather isn't worth one degree of muscle tension.</div>
+  <div class="en">So stop paying for legibility nobody will decode. Spend it on <b>full parasympathetic release, on the clock</b>. 用副交感神經放鬆去醫病。</div>
+  <div class="en" style="margin-top:10px;font-family:var(--disp);font-style:italic;font-size:14.5px;color:var(--brass)">Performing for no one but myself, all the time.</div>
 </div>
+
+<div class="back" id="back" hidden></div>
 
 <div id="status">Loading record…</div>
 
-<div class="intent" id="intentBox" hidden>
-  <div class="lbl" id="intentLbl">First move · set yesterday</div>
-  <p id="intentText"></p>
-</div>
-
 <div class="stats">
-  <div class="stat"><b id="streak">–</b><span>aligned days</span></div>
-  <div class="stat"><b id="loveN">–</b><span>愛 · 7d</span></div>
-  <div class="stat"><b id="passH">–</b><span>熱 hrs · 7d</span></div>
-  <div class="stat"><b id="freeN">–</b><span>自 · 7d</span></div>
-</div>
-
-<div class="lbl" id="todayLbl">Today</div>
-
-<div class="card val love">
-  <div class="vhead"><span class="zh">愛</span><span class="ti">Did good to someone I love</span><span class="n" id="loveCount"></span></div>
-  <div class="addrow">
-    <input type="text" id="loveIn" placeholder="who · what" autocomplete="off" enterkeyhint="done">
-    <button class="add" id="loveAdd">Log</button>
-  </div>
-  <ul class="items" id="loveList"></ul>
-</div>
-
-<div class="card val passion">
-  <div class="vhead"><span class="zh">熱</span><span class="ti">Time given fully to my passion</span><span class="n" id="passCount"></span></div>
-  <div class="mins" id="mins"></div>
-  <div class="addrow">
-    <input type="text" id="passIn" placeholder="what (optional)" autocomplete="off" enterkeyhint="done">
-    <button class="add" id="passAdd">Log</button>
-  </div>
-  <ul class="items" id="passList"></ul>
-</div>
-
-<div class="card val free">
-  <div class="vhead"><span class="zh">自</span><span class="ti">Did it without asking permission</span><span class="n" id="freeCount"></span></div>
-  <div class="addrow">
-    <input type="text" id="freeIn" placeholder="what I just did" autocomplete="off" enterkeyhint="done">
-    <button class="add" id="freeAdd">Log</button>
-  </div>
-  <ul class="items" id="freeList"></ul>
+  <div class="stat"><b id="streak">–</b><span>day streak</span></div>
+  <div class="stat"><b id="total">–</b><span>resets</span></div>
+  <div class="stat"><b id="avg">–</b><span>14d score</span></div>
+  <div class="stat"><b id="convTotal">–</b><span>誤解→放鬆</span></div>
 </div>
 
 <div class="card">
-  <div class="lbl">Natural rhythm today · 1–10 <span id="avg"></span></div>
-  <div class="scoreRow" id="scoreRow"></div>
-</div>
-
-<div class="card">
-  <div class="lbl">Tomorrow's first move</div>
-  <input type="text" id="intent" placeholder="one concrete thing for 愛 or 熱" autocomplete="off">
-  <p class="hint">Shown at the top when I open this tomorrow.</p>
-</div>
-
-<div class="card">
-  <div class="lbl">Insight (optional, one line)</div>
-  <textarea id="note"></textarea>
-</div>
-
-<details class="card" id="body">
-  <summary><span class="lbl">Body · resets · headache</span></summary>
+  <div class="lbl" id="todayLbl">Today</div>
   <div class="sessions">
     <button class="sess" id="s-am"><span class="zh">朝</span><span class="t">Morning</span></button>
     <button class="sess" id="s-md"><span class="zh">午</span><span class="t">Midday</span></button>
     <button class="sess" id="s-pm"><span class="zh">晏</span><span class="t">Afternoon</span></button>
   </div>
-  <p class="hint">Reset = <b>2–5 min</b>, 4 in / 8 out, shoulders released.</p>
-  <div class="convert sub">
-    <button class="add" id="convBtn">Misread → released deeper</button>
-    <div class="count" id="convToday">0</div>
+  <button class="breathe" id="breatheBtn">Start a 2-min reset · 4 in / 8 out</button>
+  <p class="hint">A reset = <b>2–5 min</b>: 4 in / 8 out, shoulders released. Tap when done — or let the guide log it for you.</p>
+</div>
+
+<div class="card">
+  <div class="lbl">誤解 → 放鬆 converter</div>
+  <div class="convert">
+    <button id="convBtn">Misread me? → released deeper</button>
+    <div class="count"><b id="convToday">0</b><span>today</span></div>
     <button class="ghost" id="convUndo" title="Remove one (mistap)">−1</button>
   </div>
-  <button class="tog sub" id="tHead">Headache / aura today</button>
-</details>
+  <p class="hint">Notice the label landing — a look, a comment — log it, and let it <b>trigger a release, not a defence</b>.</p>
+</div>
+
+<div class="card">
+  <div class="lbl">Relaxation quality today · 1–10</div>
+  <div class="scoreRow" id="scoreRow"></div>
+</div>
+
+<div class="card">
+  <div class="lbl">Body ledger</div>
+  <button class="tog" id="tHead">Headache / aura today</button>
+  <p class="hint">The outcome variable — and the dated record your doctors will ask for. Empty months are the win.</p>
+</div>
+
+<div class="card">
+  <div class="lbl">Note (optional — triggers, wins, one line)</div>
+  <textarea id="note" placeholder="e.g. stayed loose through 3pm meeting / wine+heat avoided…"></textarea>
+</div>
+
+<button class="save" id="saveBtn">Save today's record</button>
 
 <div class="card" style="margin-top:22px">
   <div class="lbl">Last 28 days</div>
   <div class="grid" id="grid"></div>
   <div class="legend">
-    <span><i style="background:var(--love)"></i>愛 loved ones</span>
-    <span><i style="background:var(--passion)"></i>熱 passion</span>
-    <span><i style="background:var(--free)"></i>自 no permission</span>
-    <span><i style="border-radius:2px;box-shadow:inset 0 0 0 1.5px var(--red)"></i>headache</span>
+    <span><i style="background:rgba(201,162,39,.14)"></i>1 reset</span>
+    <span><i style="background:rgba(201,162,39,.32)"></i>2</span>
+    <span><i style="background:rgba(201,162,39,.58)"></i>3</span>
+    <span><i style="box-shadow:inset 0 0 0 1.5px var(--red)"></i>headache day</span>
   </div>
-</div>
-
-<div class="card">
-  <div class="lbl">Evidence · most recent</div>
-  <ul class="ledger" id="ledger"></ul>
 </div>
 
 <div class="foot">
   <span>private record · stored on this device only</span>
   <div>
+    <button class="ghost" id="remindBtn">Add reminders</button>
     <button class="ghost" id="exportBtn">Export backup</button>
     <button class="ghost" id="importBtn">Import</button>
     <button class="ghost" id="resetBtn">Clear all</button>
@@ -272,10 +236,24 @@
 
 </div>
 
+<div id="guide" hidden role="dialog" aria-label="Guided reset">
+  <div class="orb" id="orb"></div>
+  <div class="phase" id="phase">Ready</div>
+  <div class="clock" id="clock">2:00</div>
+  <div class="gbtns">
+    <button id="gStop">Stop</button>
+    <button class="go" id="gDone" hidden>Finish &amp; log</button>
+  </div>
+</div>
+
 <script>
 (function(){
-  const KEY='pns-office-tracker-v1'; /* unchanged, so the earlier record carries over */
+  const KEY='pns-office-tracker-v1'; /* same key as the original instrument */
 
+  /* ---- storage adapter ----
+     Uses the artifact host's window.storage when present; otherwise falls back
+     to this device's localStorage. Same key either way, so an exported backup
+     from one can be imported into the other. */
   const store = {
     async get(k){
       if(window.storage && window.storage.get) return await window.storage.get(k);
@@ -291,39 +269,24 @@
   };
   let data={days:{}};
   let today=localDate(new Date());
-  let selMin=0;
   const $=id=>document.getElementById(id);
   const status=$('status');
-  const VALS=['love','passion','free'];
-  const GLYPH={love:'愛',passion:'熱',free:'自'};
 
   function localDate(d){
     const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
     return y+'-'+m+'-'+dd;
   }
-  function shift(n){ const d=new Date(); d.setDate(d.getDate()+n); return d; }
-  function hhmm(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
-  function norm(r){ /* fill in fields missing from older records */
-    if(!r.sessions) r.sessions={};
-    if(r.score===undefined) r.score=null;
-    if(r.conv===undefined) r.conv=0;
-    if(r.note===undefined) r.note='';
-    if(r.intent===undefined) r.intent='';
-    VALS.forEach(v=>{ if(!Array.isArray(r[v])) r[v]=[]; });
-    return r;
-  }
   function day(k){
-    if(!data.days[k]) data.days[k]={headache:false};
-    return norm(data.days[k]);
+    if(!data.days[k]) data.days[k]={sessions:{},score:null,headache:false,note:'',conv:0};
+    if(data.days[k].conv===undefined) data.days[k].conv=0; /* migrate old logs */
+    return data.days[k];
   }
-  function peek(k){ return data.days[k]?norm(data.days[k]):null; }
-  function aligned(r){ return !!r && (r.love.length>0 || r.passion.length>0); }
   function setStatus(msg,err){ status.textContent=msg||''; status.className=err?'err':''; }
 
   async function load(){
     try{
       const res=await store.get(KEY);
-      if(res&&res.value){ data=JSON.parse(res.value); if(!data.days) data.days={}; setStatus('Record loaded ✓ · '+today); }
+      if(res&&res.value){ data=JSON.parse(res.value); setStatus('Record loaded ✓ · '+today); }
       else setStatus('New record started · '+today);
     }catch(e){
       setStatus('New record started · '+today);
@@ -341,29 +304,7 @@
       setStatus('Save failed — will retry on next action. Data kept in this session.', true);
     }
   }
-  function queueSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>persist(true),400); }
-
-  function el(tag,cls,text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!==undefined) e.textContent=text; return e; }
-
-  function renderList(v,listId,countId){
-    const t=day(today); const ul=$(listId); ul.innerHTML='';
-    t[v].forEach((it,i)=>{
-      const li=el('li');
-      li.appendChild(el('span','tm',it.t||''));
-      li.appendChild(el('span','tx',it.x||''));
-      if(it.m) li.appendChild(el('span','mn',it.m+' min'));
-      const del=el('button',null,'×'); del.title='Remove'; del.setAttribute('aria-label','Remove entry');
-      del.addEventListener('click',()=>{ t[v].splice(i,1); render(); queueSave(); });
-      li.appendChild(del);
-      ul.appendChild(li);
-    });
-    if(v==='passion'){
-      const m=t.passion.reduce((s,it)=>s+(it.m||0),0);
-      $(countId).textContent=m?(m+' min'):'';
-    }else{
-      $(countId).textContent=t[v].length?('× '+t[v].length):'';
-    }
-  }
+  function queueSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>persist(false),400); }
 
   const sessIds={am:'s-am',md:'s-md',pm:'s-pm'};
   function render(){
@@ -371,126 +312,77 @@
     const t=day(today);
     $('todayLbl').textContent='Today · '+today;
 
-    renderList('love','loveList','loveCount');
-    renderList('passion','passList','passCount');
-    renderList('free','freeList','freeCount');
-
-    const mins=$('mins'); mins.innerHTML='';
-    [15,30,45,60,90,120].forEach(m=>{
-      const b=el('button',selMin===m?'sel':null,String(m));
-      b.setAttribute('aria-label',m+' minutes');
-      b.addEventListener('click',()=>{ selMin=(selMin===m?0:m); render(); });
-      mins.appendChild(b);
+    Object.keys(sessIds).forEach(k=>{
+      $(sessIds[k]).classList.toggle('done', !!t.sessions[k]);
     });
-    mins.appendChild(el('span','hint','min')).style.cssText='margin:0;align-self:center';
 
     const row=$('scoreRow'); row.innerHTML='';
     for(let i=1;i<=10;i++){
-      const b=el('button',t.score===i?'sel':null,String(i));
+      const b=document.createElement('button');
+      b.textContent=i;
+      if(t.score===i) b.classList.add('sel');
       b.addEventListener('click',()=>{ t.score=(t.score===i?null:i); render(); queueSave(); });
       row.appendChild(b);
     }
 
-    Object.keys(sessIds).forEach(k=>{ $(sessIds[k]).classList.toggle('done', !!t.sessions[k]); });
     $('tHead').classList.toggle('on', !!t.headache);
     $('convToday').textContent=t.conv||0;
     if(document.activeElement!==$('note')) $('note').value=t.note||'';
-    if(document.activeElement!==$('intent')) $('intent').value=t.intent||'';
 
-    renderIntent(); renderStats(); renderGrid(); renderLedger();
+    renderStats(); renderGrid(); renderBack();
   }
 
-  function renderIntent(){
-    /* most recent first-move set on an earlier day (within two weeks) */
-    let found=null, when=0;
-    for(let i=1;i<=14;i++){
-      const r=peek(localDate(shift(-i)));
-      if(r&&r.intent&&r.intent.trim()){ found=r.intent.trim(); when=i; break; }
-    }
-    $('intentBox').hidden=!found;
-    if(found){
-      $('intentLbl').textContent='First move · set '+(when===1?'yesterday':when+' days ago');
-      $('intentText').textContent=found;
-    }
+  /* welcome-back: after a gap, say so plainly instead of just showing streak 0 */
+  function renderBack(){
+    const box=$('back');
+    if(Object.values(day(today).sessions).some(Boolean)){ box.hidden=true; return; }
+    const past=Object.keys(data.days).filter(k=>k<today && Object.values(data.days[k].sessions||{}).some(Boolean)).sort();
+    if(!past.length){ box.hidden=true; return; }
+    const last=past[past.length-1];
+    const gap=Math.round((new Date(today+'T00:00')-new Date(last+'T00:00'))/86400000);
+    if(gap<2){ box.hidden=true; return; }
+    box.innerHTML='Welcome back. Last reset was <b>'+gap+' days ago</b> — one 2-minute reset restarts the record.';
+    box.hidden=false;
   }
 
   function renderStats(){
     let streak=0; let d=new Date();
-    if(!aligned(peek(today))) d.setDate(d.getDate()-1);
+    const todayHas=Object.values(day(today).sessions).some(Boolean);
+    if(!todayHas) d.setDate(d.getDate()-1);
     for(;;){
-      if(aligned(peek(localDate(d)))){ streak++; d.setDate(d.getDate()-1); }
+      const k=localDate(d); const rec=data.days[k];
+      if(rec&&Object.values(rec.sessions||{}).some(Boolean)){ streak++; d.setDate(d.getDate()-1); }
       else break;
     }
     $('streak').textContent=streak;
 
-    const c7=localDate(shift(-6)), c14=localDate(shift(-13));
-    let love=0, mins=0, free=0, sSum=0, sN=0;
+    let total=0, scoreSum=0, scoreN=0, convAll=0;
+    const cutoff=localDate((()=>{const c=new Date();c.setDate(c.getDate()-13);return c;})());
     Object.keys(data.days).forEach(k=>{
-      const r=peek(k);
-      if(k>=c7){ love+=r.love.length; free+=r.free.length; mins+=r.passion.reduce((s,it)=>s+(it.m||0),0); }
-      if(r.score && k>=c14){ sSum+=r.score; sN++; }
+      const rec=data.days[k];
+      total+=Object.values(rec.sessions||{}).filter(Boolean).length;
+      convAll+=rec.conv||0;
+      if(rec.score && k>=cutoff){ scoreSum+=rec.score; scoreN++; }
     });
-    $('loveN').textContent=love;
-    $('freeN').textContent=free;
-    const h=mins/60; $('passH').textContent=h?(h%1?h.toFixed(1):String(h)):'0';
-    $('avg').textContent=sN?('· 14d avg '+(sSum/sN).toFixed(1)):'';
+    $('total').textContent=total;
+    $('avg').textContent=scoreN? (scoreSum/scoreN).toFixed(1) : '–';
+    $('convTotal').textContent=convAll;
   }
 
   function renderGrid(){
     const g=$('grid'); g.innerHTML='';
-    for(let i=27;i>=0;i--){
-      const d=shift(-i); const k=localDate(d); const r=peek(k);
-      const hit=VALS.map(v=>!!(r&&r[v].length));
-      const n=hit.filter(Boolean).length;
-      const cell=el('div','day'+(n?' l'+n:'')+(r&&r.headache?' hd':''));
-      cell.appendChild(el('b',null,String(d.getDate())));
-      const dots=el('span','dots');
-      ['a','b','c'].forEach((c,j)=>dots.appendChild(el('i',hit[j]?c:null)));
-      cell.appendChild(dots);
-      cell.title=k+(r?(' · 愛 '+r.love.length+' · 熱 '+r.passion.length+' · 自 '+r.free.length+(r.score?' · rhythm '+r.score:'')):'');
+    const start=new Date(); start.setDate(start.getDate()-27);
+    for(let i=0;i<28;i++){
+      const d=new Date(start); d.setDate(start.getDate()+i);
+      const k=localDate(d); const rec=data.days[k];
+      const n=rec?Object.values(rec.sessions||{}).filter(Boolean).length:0;
+      const cell=document.createElement('div');
+      cell.className='day'+(n>=3?' l3':n===2?' l2':n===1?' l1':'')+(rec&&rec.headache?' hd':'');
+      cell.innerHTML='<b>'+d.getDate()+'</b>'+(rec&&rec.score?('<span>'+rec.score+'</span>'):'');
+      cell.title=k+(rec?(' · '+n+' resets'+(rec.score?' · score '+rec.score:'')+(rec.conv?(' · '+rec.conv+' conversions'):'')):'');
       g.appendChild(cell);
     }
   }
-
-  function renderLedger(){
-    const ul=$('ledger'); ul.innerHTML='';
-    const rows=[];
-    Object.keys(data.days).sort().reverse().some(k=>{
-      const r=peek(k); const dayRows=[];
-      VALS.forEach(v=>r[v].forEach(it=>dayRows.push({k:k,v:v,it:it})));
-      dayRows.sort((a,b)=>(b.it.t||'').localeCompare(a.it.t||''));
-      rows.push.apply(rows,dayRows);
-      return rows.length>=30;
-    });
-    if(!rows.length){ ul.appendChild(el('li','empty','Nothing logged yet. The first entry starts the record.')); return; }
-    rows.slice(0,30).forEach(o=>{
-      const li=el('li');
-      li.appendChild(el('span','d',o.k.slice(5).replace('-','/')));
-      li.appendChild(el('span','g '+o.v,GLYPH[o.v]));
-      li.appendChild(el('span','tx',(o.it.x||'')+(o.it.m?' · '+o.it.m+' min':'')));
-      ul.appendChild(li);
-    });
-  }
-
-  function addEntry(v,inputId){
-    const inp=$(inputId); let x=inp.value.trim();
-    const it={t:hhmm()};
-    if(v==='passion'){
-      if(!x && !selMin){ setStatus('Pick the minutes or write what it was.',true); return; }
-      if(selMin) it.m=selMin;
-      it.x=x||'practice';
-    }else{
-      if(!x){ inp.focus(); return; }
-      it.x=x;
-    }
-    day(today)[v].push(it);
-    inp.value=''; selMin=0;
-    render(); queueSave();
-  }
-  [['love','loveIn','loveAdd'],['passion','passIn','passAdd'],['free','freeIn','freeAdd']].forEach(a=>{
-    $(a[2]).addEventListener('click',()=>addEntry(a[0],a[1]));
-    $(a[1]).addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addEntry(a[0],a[1]); } });
-  });
 
   Object.keys(sessIds).forEach(k=>{
     $(sessIds[k]).addEventListener('click',()=>{
@@ -499,11 +391,17 @@
       render(); queueSave();
     });
   });
-  $('convBtn').addEventListener('click',()=>{ const t=day(today); t.conv=(t.conv||0)+1; render(); queueSave(); });
-  $('convUndo').addEventListener('click',()=>{ const t=day(today); if((t.conv||0)>0){ t.conv--; render(); queueSave(); } });
+  $('convBtn').addEventListener('click',()=>{
+    const t=day(today); t.conv=(t.conv||0)+1; render(); queueSave();
+    setStatus('Conversion logged — misread received, tension released.');
+  });
+  $('convUndo').addEventListener('click',()=>{
+    const t=day(today);
+    if((t.conv||0)>0){ t.conv--; render(); queueSave(); setStatus('One conversion removed.'); }
+  });
   $('tHead').addEventListener('click',()=>{ const t=day(today); t.headache=!t.headache; render(); queueSave(); });
   $('note').addEventListener('input',()=>{ day(today).note=$('note').value; queueSave(); });
-  $('intent').addEventListener('input',()=>{ day(today).intent=$('intent').value; queueSave(); });
+  $('saveBtn').addEventListener('click',()=>persist(true));
 
   $('exportBtn').addEventListener('click',async ()=>{
     try{
@@ -540,11 +438,90 @@
     }
   });
 
-  window.addEventListener('pagehide',()=>{ clearTimeout(saveTimer); persist(false); });
+  /* ---- guided reset: 4 in / 8 out for 2 minutes, then logs the session ---- */
+  const IN=4, OUT=8, TOTAL=120;
+  let gTimer=null, gStart=0, wake=null;
+  function slotNow(){
+    const h=new Date().getHours();
+    const pref=h<12?'am':h<15?'md':'pm';
+    const t=day(today);
+    if(!t.sessions[pref]) return pref;
+    return ['am','md','pm'].find(k=>!t.sessions[k]) || null;
+  }
+  function fmt(s){ s=Math.max(0,Math.ceil(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+  function breath(inhale){
+    const orb=$('orb');
+    orb.style.transitionDuration=(inhale?IN:OUT)+'s';
+    orb.style.transform=inhale?'scale(1.25)':'scale(.6)';
+    $('phase').textContent=inhale?'Breathe in':'Out · let the shoulders drop';
+    if(navigator.vibrate) navigator.vibrate(inhale?30:15);
+  }
+  function openGuide(){
+    $('guide').hidden=false; $('gDone').hidden=true;
+    if(navigator.wakeLock) navigator.wakeLock.request('screen').then(w=>{ if(gTimer) wake=w; else w.release().catch(()=>{}); }).catch(()=>{});
+    gStart=Date.now(); let lastPhase=null;
+    const tick=()=>{
+      const el=(Date.now()-gStart)/1000;
+      const inhale=(el%(IN+OUT))<IN;
+      if(inhale!==lastPhase){ breath(inhale); lastPhase=inhale; }
+      $('clock').textContent=fmt(TOTAL-el);
+      if(el>=60) $('gDone').hidden=false;
+      if(el>=TOTAL) closeGuide(true);
+    };
+    tick(); gTimer=setInterval(tick,250);
+  }
+  function closeGuide(log){
+    clearInterval(gTimer); gTimer=null;
+    if(wake){ wake.release().catch(()=>{}); wake=null; }
+    $('guide').hidden=true; $('orb').style.transitionDuration='0s'; $('orb').style.transform='scale(.6)';
+    if(!log) return;
+    const k=slotNow();
+    if(k){
+      day(today).sessions[k]=new Date().toLocaleTimeString();
+      render(); queueSave();
+      setStatus('Reset logged ✓ · '+({am:'morning',md:'midday',pm:'afternoon'})[k]);
+    }else{
+      setStatus('Reset done — all three already logged today.');
+    }
+  }
+  $('breatheBtn').addEventListener('click',openGuide);
+  $('gStop').addEventListener('click',()=>closeGuide(false));
+  $('gDone').addEventListener('click',()=>closeGuide(true));
+
+  /* ---- reminders: a calendar file with three weekday nudges that link back here ---- */
+  $('remindBtn').addEventListener('click',()=>{
+    const url=location.href.split('#')[0];
+    const d=new Date(); const ymd=localDate(d).replace(/-/g,'');
+    const slots=[['1030','朝 · morning reset'],['1330','午 · midday reset'],['1600','晏 · afternoon reset']];
+    const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//pns//office reset//EN','CALSCALE:GREGORIAN'];
+    slots.forEach((s,i)=>{
+      lines.push('BEGIN:VEVENT',
+        'UID:pns-reset-'+i+'-'+ymd+'@pns',
+        'DTSTAMP:'+ymd+'T000000Z',
+        'DTSTART:'+ymd+'T'+s[0]+'00',
+        'DURATION:PT5M',
+        'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR',
+        'SUMMARY:'+s[1],
+        'DESCRIPTION:4 in / 8 out\\, shoulders released. '+url,
+        'URL:'+url,
+        'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+s[1],'TRIGGER:PT0M','END:VALARM',
+        'END:VEVENT');
+    });
+    lines.push('END:VCALENDAR');
+    const blob=new Blob([lines.join('\r\n')],{type:'text/calendar'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='pns-reset-reminders.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    setStatus('Reminder file created — open it to add 10:30 · 13:30 · 16:00 weekday nudges to your calendar.');
+  });
+
   setInterval(()=>{ if(localDate(new Date())!==today){ render(); } }, 60000);
 
   load();
 
+  /* register the worker (needed for desktop "Install app"); network-first,
+     so a stale cache can never shadow an updated file. */
   if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     window.addEventListener('load',()=>{
       navigator.serviceWorker.register('sw.js').catch(()=>{});
